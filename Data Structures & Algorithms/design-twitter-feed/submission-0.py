@@ -1,0 +1,38 @@
+class Twitter:
+
+    def __init__(self):
+        self.time = 0
+        self.tweet = defaultdict(list)
+        self.followMp = defaultdict(set)
+
+    def postTweet(self, userId: int, tweetId: int) -> None:
+        self.tweet[userId].append([self.time, tweetId])
+        self.time -= 1
+
+    def getNewsFeed(self, userId: int) -> List[int]:
+        res = []
+        minHeap = []
+
+        self.followMp[userId].add(userId)
+        for followeeId in self.followMp[userId]:
+            if followeeId in self.tweet:
+                index = len(self.tweet[followeeId]) - 1
+                time, tweetId = self.tweet[followeeId][index]
+                heapq.heappush(minHeap, [time, tweetId, followeeId, index - 1])
+
+        while minHeap and len(res) < 10:
+            time, tweetId, followeeID, index = heapq.heappop(minHeap)
+            res.append(tweetId)
+            if index >= 0:
+                time, tweetId = self.tweet[followeeID][index]
+                heapq.heappush(minHeap,[time, tweetId, followeeID, index - 1])
+
+
+        return res
+
+    def follow(self, followerId: int, followeeId: int) -> None:
+        self.followMp[followerId].add(followeeId)
+
+    def unfollow(self, followerId: int, followeeId: int) -> None:
+        if followeeId in self.followMp[followerId]:
+            self.followMp[followerId].remove(followeeId)
