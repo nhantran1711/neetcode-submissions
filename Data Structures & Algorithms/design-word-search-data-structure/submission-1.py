@@ -1,0 +1,39 @@
+class TrieNode:
+    def __init__(self):
+        self.children = {} # cur : TrieNode
+        self.isEnd = False
+
+class WordDictionary:
+
+    def __init__(self):
+        self.root = TrieNode()
+
+    def addWord(self, word: str) -> None:
+        cur = self.root
+        for w in word:
+            if w not in cur.children:
+                cur.children[w] = TrieNode()
+            cur = cur.children[w]
+        cur.isEnd = True
+
+    def search(self, word: str) -> bool:
+
+        def backtrack(j, root):      
+            cur = root
+
+            for i in range(j, len(word)):
+                w = word[i]
+
+                if w != '.':
+                    if w not in cur.children:
+                        return False
+                    cur = cur.children[w]
+                else:
+                    for child in cur.children.values():
+                        if backtrack(i + 1, child):
+                            return True
+                    return False
+            return cur.isEnd
+        return backtrack(0, self.root)
+        
+        
